@@ -12,7 +12,7 @@ import yunabook.yunashop.repository.MemberRepository;
 
 @Service
 @Transactional // JPA안에서 데이터를 변경하는 메서드에는 필수적으로 Transactional 어노테이션을 붙여줘야 한다
-// class 레벨에 @Transactional 어노테이션을 붙여주면 모든 메서드에 동일하게 적용되며, 
+// class 레벨에 @Transactional 어노테이션을 붙여주면 모든 메서드에 동일하게 적용되며,
 // 메서드 레벨에 @Transactional 어노테이션을 붙여주면 해당 메서드에만 설정한 내용이 우선으로 적용된다.
 
 @RequiredArgsConstructor // final이 붙은 필드를 모아서 생성자를 자동으로 생성해준다.
@@ -27,9 +27,10 @@ public class MemberService {
   // 그래서 실행 이후 변경이 불가능
   // 또한 테스트 코드 작성 시 편리함
   // 최신 스프링에서는 @Autowired 어노테이션을 선언하지 않아도 자동으로 주입된다.
-  // @RequiredArgsConstructor 어노테이션을 사용하면 final이 붙은 필드를 모아서 생성자를 자동으로 생성해준다. => 따라서 생성자 코드를 작성하지 않아도 된다.
+  // @RequiredArgsConstructor 어노테이션을 사용하면 final이 붙은 필드를 모아서 생성자를 자동으로 생성해준다. =>
+  // 따라서 생성자 코드를 작성하지 않아도 된다.
   // public MemberService(MemberRepository memberRepository) {
-  //   this.memberRepository = memberRepository;
+  // this.memberRepository = memberRepository;
   // }
 
   /**
@@ -75,9 +76,18 @@ public class MemberService {
    */
   @Transactional
   public void update(Long id, String name, String city, String street, String zipcode) {
-    validateDuplicateMember(name);
     Member member = memberRepository.findOne(id);
-    member.setName(name);
-    member.setAddress(new Address(city, street, zipcode));
+
+    if (name != null) {
+      validateDuplicateMember(name);
+      member.setName(name);
+    }
+    if (city != null || street != null || zipcode != null) {
+      Address currentAddress = member.getAddress();
+      String newCity = city != null ? city : currentAddress.getCity();
+      String newStreet = street != null ? street : currentAddress.getStreet();
+      String newZipcode = zipcode != null ? zipcode : currentAddress.getZipcode();
+      member.setAddress(new Address(newCity, newStreet, newZipcode));
+    }
   }
 }

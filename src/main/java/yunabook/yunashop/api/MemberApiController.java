@@ -53,7 +53,7 @@ public class MemberApiController {
   public UpdateMemberResponse updateMember(@PathVariable Long id, @RequestBody @Valid UpdateMemberRequest request) {
     memberService.update(id, request.getName(), request.getCity(), request.getStreet(), request.getZipcode());
     Member findMember = memberService.findOne(id);
-    return new UpdateMemberResponse(findMember.getId(), findMember.getName());
+    return new UpdateMemberResponse(id, findMember.getName());
   }
 
   
