@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import yunabook.yunashop.domain.Address;
 import yunabook.yunashop.domain.Member;
 import yunabook.yunashop.repository.MemberRepository;
 
@@ -36,7 +37,7 @@ public class MemberService {
    */
   @Transactional // 데이터를 변경하는 메서드에는 readOnly = true를 사용하면 안된다. => 변경이 안됨
   public Long join(Member member) {
-    validateDuplicateMember(member); // 중복 회원 검증
+    validateDuplicateMember(member.getName()); // 중복 회원 검증
     memberRepository.save(member);
 
     // 영속성 컨텍스트가 db에 persist 하는 시점에 id가 생성되기 때문에 id가 있는 것을 보장해준다.
@@ -46,8 +47,8 @@ public class MemberService {
   /**
    * 중복 회원 검증
    */
-  private void validateDuplicateMember(Member member) {
-    List<Member> findMembers = memberRepository.findByName(member.getName());
+  private void validateDuplicateMember(String name) {
+    List<Member> findMembers = memberRepository.findByName(name);
     if (!findMembers.isEmpty()) {
       throw new IllegalStateException("이미 존재하는 회원입니다.");
     }
@@ -69,4 +70,14 @@ public class MemberService {
     return memberRepository.findOne(memberId);
   }
 
+  /**
+   * 회원 수정
+   */
+  @Transactional
+  public void update(Long id, String name, String city, String street, String zipcode) {
+    validateDuplicateMember(name);
+    Member member = memberRepository.findOne(id);
+    member.setName(name);
+    member.setAddress(new Address(city, street, zipcode));
+  }
 }
