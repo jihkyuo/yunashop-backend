@@ -84,10 +84,14 @@ public class MemberService {
     }
     if (city != null || street != null || zipcode != null) {
       Address currentAddress = member.getAddress();
-      String newCity = city != null ? city : currentAddress.getCity();
-      String newStreet = street != null ? street : currentAddress.getStreet();
-      String newZipcode = zipcode != null ? zipcode : currentAddress.getZipcode();
-      member.setAddress(new Address(newCity, newStreet, newZipcode));
+      if (currentAddress == null) {
+        member.setAddress(new Address(city, street, zipcode));
+      } else {
+        String newCity = city != null ? city : currentAddress.getCity();
+        String newStreet = street != null ? street : currentAddress.getStreet();
+        String newZipcode = zipcode != null ? zipcode : currentAddress.getZipcode();
+        member.setAddress(new Address(newCity, newStreet, newZipcode));
+      }
     }
   }
 }
