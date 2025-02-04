@@ -16,6 +16,7 @@ import yunabook.yunashop.api.dto.request.CreateMemberRequest;
 import yunabook.yunashop.api.dto.request.UpdateMemberRequest;
 import yunabook.yunashop.api.dto.response.CreateMemberResponse;
 import yunabook.yunashop.api.dto.response.MemberResponseDto;
+import yunabook.yunashop.api.dto.response.ResultResponse;
 import yunabook.yunashop.api.dto.response.UpdateMemberResponse;
 import yunabook.yunashop.domain.Address;
 import yunabook.yunashop.domain.Member;
@@ -27,12 +28,22 @@ public class MemberApiController {
 
   private final MemberService memberService;
 
+  // 회원 조회
+  // DTO를 사용하지 않고 엔티티를 그대로 반환하면 orders와 양방향 관계로 순환 참조가 발생하여 결과 값이 무한히 증식함
+  @GetMapping("/members")
+  public ResultResponse<List<MemberResponseDto>> findMembers() {
+    List<MemberResponseDto> collect = memberService.findMembers().stream()
+        .map(MemberResponseDto::new)
+        .collect(Collectors.toList());
+    return new ResultResponse<>(collect);
+  }
+
   /**
    * 회원 가입
    * 
    * @param CreateMemberRequest
    * @return CreateMemberResponse
-   * */ 
+   */
   @PostMapping("/members/join")
   public CreateMemberResponse createMember(@RequestBody @Valid CreateMemberRequest request) {
     Address address = new Address(request.getCity(), request.getStreet(), request.getZipcode());
@@ -48,23 +59,12 @@ public class MemberApiController {
    * 
    * @param UpdateMemberRequest
    * @return UpdateMemberResponse
-   * */ 
+   */
   @PutMapping("/members/{id}")
   public UpdateMemberResponse updateMember(@PathVariable Long id, @RequestBody @Valid UpdateMemberRequest request) {
     memberService.update(id, request.getName(), request.getCity(), request.getStreet(), request.getZipcode());
     Member findMember = memberService.findOne(id);
     return new UpdateMemberResponse(id, findMember.getName());
-  }
-
-  
-
-  // 회원 조회
-  // DTO를 사용하지 않고 엔티티를 그대로 반환하면 orders와 양방향 관계로 순환 참조가 발생하여 결과 값이 무한히 증식함
-  @GetMapping("/members")
-  public List<MemberResponseDto> findMembers() {
-    return memberService.findMembers().stream()
-        .map(MemberResponseDto::new)
-        .collect(Collectors.toList());
   }
 
   @GetMapping("/members/{memberId}")
