@@ -35,6 +35,12 @@ public class OrderSimpleApiController {
      */
 
     List<Order> all = orderRepository.findAllByCriteria(new OrderSearch());
+
+    // 강제로 지연 로딩 대상을 조회하여 프록시 객체를 초기화 시킴
+    for (Order order : all) {
+      order.getMember().getName();
+      order.getDelivery().getAddress();
+    }
     return all;
   }
 
