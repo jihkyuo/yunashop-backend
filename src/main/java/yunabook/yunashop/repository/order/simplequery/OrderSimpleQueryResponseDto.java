@@ -1,4 +1,4 @@
-package yunabook.yunashop.api.dto.response;
+package yunabook.yunashop.repository.order.simplequery;
 
 import java.time.LocalDateTime;
 

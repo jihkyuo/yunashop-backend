@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import yunabook.yunashop.api.dto.response.OrderSimpleQueryResponseDto;
 import yunabook.yunashop.domain.Address;
 import yunabook.yunashop.domain.Order;
 import yunabook.yunashop.domain.OrderStatus;
 import yunabook.yunashop.repository.OrderRepository;
 import yunabook.yunashop.repository.OrderSearch;
+import yunabook.yunashop.repository.order.simplequery.OrderSimpleQueryRepository;
+import yunabook.yunashop.repository.order.simplequery.OrderSimpleQueryResponseDto;
 
 /**
  * xToOne 관계 최적화 실습
@@ -26,6 +27,7 @@ import yunabook.yunashop.repository.OrderSearch;
 @RequiredArgsConstructor
 public class OrderSimpleApiController {
   private final OrderRepository orderRepository;
+  private final OrderSimpleQueryRepository orderSimpleQueryRepository;
 
   @GetMapping("/api/v1/simple-orders")
   public List<Order> ordersV1() {
@@ -81,7 +83,7 @@ public class OrderSimpleApiController {
 
   @GetMapping("/api/v4/simple-orders")
   public List<OrderSimpleQueryResponseDto> ordersV4() {
-    return orderRepository.findOrdersDto();
+    return orderSimpleQueryRepository.findOrdersDto();
   }
 
   @Data
