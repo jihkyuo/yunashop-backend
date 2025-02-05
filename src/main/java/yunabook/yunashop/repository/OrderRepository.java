@@ -34,8 +34,8 @@ public class OrderRepository {
   // 검색 메서드
   public List<Order> findAll(OrderSearch orderSearch) {
     return em.createQuery("select o from Order o join o.member m", Order.class)
-      .setMaxResults(1000)
-      .getResultList();
+        .setMaxResults(1000)
+        .getResultList();
   }
 
   public List<Order> findAllByCriteria(OrderSearch orderSearch) {
@@ -61,6 +61,17 @@ public class OrderRepository {
     cq.where(cb.and(criteria.toArray(new Predicate[criteria.size()])));
     TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000);
     return query.getResultList();
+  }
+
+  /**
+   * ! 매우중요: fetch join 사용
+   * sql 입장에서는 1번 조회하면서 select 절에 연관 관계인 테이블을 조인하여 한번에 가져옴
+   * */
+  public List<Order> findAllWithMemberDelivery() {
+    return em.createQuery("select o from Order o" +
+        " join fetch o.member m" +
+        " join fetch o.delivery d", Order.class)
+        .getResultList();
   }
 
 }
