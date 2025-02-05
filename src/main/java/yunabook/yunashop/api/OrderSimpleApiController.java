@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import yunabook.yunashop.api.dto.response.OrderSimpleQueryResponseDto;
 import yunabook.yunashop.domain.Address;
 import yunabook.yunashop.domain.Order;
 import yunabook.yunashop.domain.OrderStatus;
@@ -52,14 +53,14 @@ public class OrderSimpleApiController {
 
   @GetMapping("/api/v2/simple-orders")
   public List<OrderSimpleDto> ordersV2() {
-    //! 이 api도 문제가 있음 => N+1 문제가 발생함 (성능이 떨어짐)
+    // ! 이 api도 문제가 있음 => N+1 문제가 발생함 (성능이 떨어짐)
     /**
      * 주문 수가 2개인 경우 각 주문별 루프를 돌 때 Member와 Delivery를 조회하는 쿼리가 2번 실행됨
      * why?
      * 주문 조회 시 연관 관계인 Member와 Delivery는 //! 지연 로딩으로 조회되지 않음
      * 주문 조회 후 각 주문별로 연관 관계인 Member와 Delivery를 조회하기 위해 추가적인 쿼리가 실행됨
      * 결과적으로 주문 수가 2개인 경우 총 5번의 쿼리가 실행됨
-     * */
+     */
     List<Order> orders = orderRepository.findAllByCriteria(new OrderSearch());
     List<OrderSimpleDto> collect = orders.stream()
         .map(OrderSimpleDto::new)
@@ -76,6 +77,11 @@ public class OrderSimpleApiController {
         .collect(Collectors.toList());
 
     return collect;
+  }
+
+  @GetMapping("/api/v4/simple-orders")
+  public List<OrderSimpleQueryResponseDto> ordersV4() {
+    return orderRepository.findOrdersDto();
   }
 
   @Data
