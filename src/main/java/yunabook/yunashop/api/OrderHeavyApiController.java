@@ -1,5 +1,9 @@
 package yunabook.yunashop.api;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,8 +20,10 @@ import yunabook.yunashop.domain.OrderItem;
 import yunabook.yunashop.domain.OrderStatus;
 import yunabook.yunashop.repository.OrderRepository;
 import yunabook.yunashop.repository.OrderSearch;
+import yunabook.yunashop.repository.order.heavyquery.OrderFlatDto;
 import yunabook.yunashop.repository.order.heavyquery.OrderHeavyQueryRepository;
 import yunabook.yunashop.repository.order.heavyquery.OrderHeavyQueryResponseDto;
+import yunabook.yunashop.repository.order.heavyquery.OrderItemQueryDto;
 
 @RestController
 @RequiredArgsConstructor
@@ -58,6 +64,21 @@ public class OrderHeavyApiController {
   @GetMapping("/api/v5/orders")
   public List<OrderHeavyQueryResponseDto> ordersV5() {
     return orderHeavyQueryRepository.findAllByDto_optimization();
+  }
+
+  @GetMapping("/api/v6/orders")
+  public List<OrderHeavyQueryResponseDto> ordersV6() {
+    List<OrderFlatDto> flats = orderHeavyQueryRepository.findAllByDto_flat();
+    return flats.stream()
+        .collect(groupingBy(o -> new OrderHeavyQueryResponseDto(o.getOrderId(),
+            o.getMemberName(), o.getOrderStatus(), o.getAddress(), o.getOrderDate()),
+            mapping(o -> new OrderItemQueryDto(o.getOrderId(),
+                o.getItemName(), o.getOrderPrice(), o.getCount()), toList())))
+        .entrySet().stream()
+        .map(e -> new OrderHeavyQueryResponseDto(e.getKey().getOrderId(),
+            e.getKey().getMemberName(), e.getKey().getOrderStatus(), e.getKey().getAddress(),
+            e.getKey().getOrderDate(), e.getValue()))
+        .collect(Collectors.toList());
   }
 
   /**
