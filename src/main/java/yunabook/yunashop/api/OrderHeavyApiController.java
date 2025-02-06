@@ -40,6 +40,12 @@ public class OrderHeavyApiController {
     return all.stream().map(OrderDto::new).collect(Collectors.toList());
   }
 
+  @GetMapping("/api/v3/orders")
+  public List<OrderDto> ordersV3() {
+    List<Order> all = orderRepository.findAllWithItem();
+    return all.stream().map(OrderDto::new).collect(Collectors.toList());
+  }
+
   @Data
   static class OrderDto {
     private Long orderId;
