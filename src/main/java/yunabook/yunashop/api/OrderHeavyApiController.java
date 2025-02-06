@@ -55,6 +55,11 @@ public class OrderHeavyApiController {
     return orderHeavyQueryRepository.findOrderQueryDtos();
   }
 
+  @GetMapping("/api/v5/orders")
+  public List<OrderHeavyQueryResponseDto> ordersV5() {
+    return orderHeavyQueryRepository.findAllByDto_optimization();
+  }
+
   /**
    * 컬렉션 페이징 최적화
    * 1. 우선 ToOne 관계 모두 fetch join (Member, Delivery)
