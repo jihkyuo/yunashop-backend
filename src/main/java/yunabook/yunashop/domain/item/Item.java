@@ -3,6 +3,8 @@ package yunabook.yunashop.domain.item;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
@@ -16,6 +18,7 @@ import lombok.Setter;
 import yunabook.yunashop.domain.Category;
 import yunabook.yunashop.exception.NotEnoughStockException;
 
+@BatchSize(size = 100) // ToOne 관계는 어노테이션을 class에
 @Entity
 @Getter
 @Setter
