@@ -16,12 +16,15 @@ import yunabook.yunashop.domain.OrderItem;
 import yunabook.yunashop.domain.OrderStatus;
 import yunabook.yunashop.repository.OrderRepository;
 import yunabook.yunashop.repository.OrderSearch;
+import yunabook.yunashop.repository.order.heavyquery.OrderHeavyQueryRepository;
+import yunabook.yunashop.repository.order.heavyquery.OrderHeavyQueryResponseDto;
 
 @RestController
 @RequiredArgsConstructor
 public class OrderHeavyApiController {
 
   private final OrderRepository orderRepository;
+  private final OrderHeavyQueryRepository orderHeavyQueryRepository;
 
   @GetMapping("/api/v1/orders")
   public List<Order> ordersV1() {
@@ -45,6 +48,11 @@ public class OrderHeavyApiController {
   public List<OrderDto> ordersV3() {
     List<Order> all = orderRepository.findAllWithItem();
     return all.stream().map(OrderDto::new).collect(Collectors.toList());
+  }
+
+  @GetMapping("/api/v4/orders")
+  public List<OrderHeavyQueryResponseDto> ordersV4() {
+    return orderHeavyQueryRepository.findOrderQueryDtos();
   }
 
   /**
