@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.Data;
@@ -43,6 +44,21 @@ public class OrderHeavyApiController {
   @GetMapping("/api/v3/orders")
   public List<OrderDto> ordersV3() {
     List<Order> all = orderRepository.findAllWithItem();
+    return all.stream().map(OrderDto::new).collect(Collectors.toList());
+  }
+
+  /**
+   * 컬렉션 페이징 최적화
+   * 1. 우선 ToOne 관계 모두 fetch join (Member, Delivery)
+   * 2. 컬렉션은 지연 로딩으로 조회
+   * ! 3. (핵심) 지연 로딩 성능 향상을 위해 hibernate.default_batch_fetch_size, @BatchSize 사용
+   * => 자동으로 in 쿼리 생성
+   */
+  @GetMapping("/api/v3.1/orders")
+  public List<OrderDto> ordersV3_page(
+      @RequestParam(value = "offset", defaultValue = "0") int offset,
+      @RequestParam(value = "limit", defaultValue = "100") int limit) {
+    List<Order> all = orderRepository.findAllWithMemberDelivery(offset, limit);
     return all.stream().map(OrderDto::new).collect(Collectors.toList());
   }
 

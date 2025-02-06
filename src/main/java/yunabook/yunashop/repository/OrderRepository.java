@@ -77,6 +77,18 @@ public class OrderRepository {
         .getResultList();
   }
 
+  /**
+   * 컬렉션 페이징 최적화
+   */
+  public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+    return em.createQuery("select o from Order o" +
+        " join fetch o.member m" +
+        " join fetch o.delivery d", Order.class)
+        .setFirstResult(offset)
+        .setMaxResults(limit)
+        .getResultList();
+  }
+
   public List<Order> findAllWithItem() {
     /**
      * distinct는 oneToMany 조인 시 중복된 결과를 제거하는 역할
