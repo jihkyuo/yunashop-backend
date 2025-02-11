@@ -27,4 +27,10 @@ public class Hospital {
   @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL)
   private List<Doctor> doctors = new ArrayList<>();
 
+  // ===== 생성 메서드 =====
+  public static Hospital createHospital(String name) {
+    Hospital hospital = new Hospital();
+    hospital.setName(name);
+    return hospital;
+  }
 }
