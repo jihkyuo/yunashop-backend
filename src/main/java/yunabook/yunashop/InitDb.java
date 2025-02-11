@@ -32,6 +32,7 @@ public class InitDb {
   public void init() {
     initDbService.dbInit1();
     initDbService.dbInit2();
+    initDbService.dbInitMemberMass();
   }
 
   @Component
@@ -74,6 +75,13 @@ public class InitDb {
       Delivery delivery = createDelivery(member);
       Order order = Order.createOrder(member, delivery, orderItem1, orderItem2);
       em.persist(order);
+    }
+
+    public void dbInitMemberMass() {
+      for (int i = 0; i < 100; i++) {
+        Member member = createMember("user" + i, "서울", "섬밭로", "1111");
+        em.persist(member);
+      }
     }
 
     private Delivery createDelivery(Member member) {

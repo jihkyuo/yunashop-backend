@@ -16,6 +16,15 @@ public class YunashopApplication {
 		SpringApplication.run(YunashopApplication.class, args);
 	}
 
+	/**
+	 * 역할
+	 * 
+	 * 1. 스프링 부트 애플리케이션의 진입점
+	 * 2. 스프링 컨텍스트를 생성하고 관리
+	 * 3. 애플리케이션 시작 시 필요한 설정 초기화
+	 * 4. 애플리케이션 종료 시 필요한 정리 작업 수행
+	 * 
+	 * */ 
 	@Bean
 	Hibernate5JakartaModule hibernate5JakartaModule() {
 		Hibernate5JakartaModule hibernate5JakartaModule = new Hibernate5JakartaModule();
