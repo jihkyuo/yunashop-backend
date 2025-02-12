@@ -18,6 +18,11 @@ public class PatientRepository {
     em.persist(patient);
   }
 
+  public void delete(Long id) {
+    Patient patient = findOne(id);
+    em.remove(patient);
+  }
+
   public Patient findOne(Long id) {
     return em.find(Patient.class, id);
   }

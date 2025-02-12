@@ -30,4 +30,8 @@ public class PatientService {
   public Patient findOne(Long patientId) {
     return patientRepository.findOne(patientId);
   }
+
+  public void delete(Long patientId) {
+    patientRepository.delete(patientId);
+  }
 }
