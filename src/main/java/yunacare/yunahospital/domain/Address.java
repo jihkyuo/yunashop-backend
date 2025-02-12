@@ -19,4 +19,8 @@ public class Address {
     this.street = street;
     this.zipcode = zipcode;
   }
+
+  public static Address empty() {
+    return new Address(null, null, null);
+  }
 }

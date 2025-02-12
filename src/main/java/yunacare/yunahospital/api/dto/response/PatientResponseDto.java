@@ -29,6 +29,19 @@ public class PatientResponseDto {
         .collect(Collectors.toList());
   }
 
+  public PatientResponseDto(
+      Long id,
+      String name,
+      String phone,
+      Address address,
+      List<AppointmentResponseDto> appointments) {
+    this.id = id;
+    this.name = name;
+    this.phone = phone;
+    this.address = address;
+    this.appointments = appointments;
+  }
+
   @Data
   static class AppointmentResponseDto {
     private Long id;

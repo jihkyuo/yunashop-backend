@@ -18,6 +18,8 @@ import yunacare.yunahospital.api.dto.response.PatientResponseDto;
 import yunacare.yunahospital.api.dto.response.ResultResponse;
 import yunacare.yunahospital.domain.Address;
 import yunacare.yunahospital.domain.Patient;
+import yunacare.yunahospital.repository.patient.query.PatientQueryRepository;
+import yunacare.yunahospital.repository.patient.query.PatientQueryResponse;
 import yunacare.yunahospital.service.PatientService;
 
 @RestController
@@ -25,10 +27,11 @@ import yunacare.yunahospital.service.PatientService;
 public class PatientApiController {
 
   private final PatientService patientService;
+  private final PatientQueryRepository patientQueryRepository;
 
-  // 환자 조회
-  @GetMapping("/patients")
-  public ResultResponse<List<PatientResponseDto>> findPatients() {
+  // 환자 조회(일반_레거시)
+  @GetMapping("/patients/normal")
+  public ResultResponse<List<PatientResponseDto>> findPatientsNormal() {
     List<PatientResponseDto> collect = patientService.findPatients().stream()
         .map(PatientResponseDto::new)
         .collect(Collectors.toList());
@@ -53,4 +56,12 @@ public class PatientApiController {
   public void deletePatient(@PathVariable Long id) {
     patientService.delete(id);
   }
+
+  // 환자 조회(페이징 dto_최적화)
+  @GetMapping("/patients")
+  public ResultResponse<List<PatientQueryResponse>> findPatients() {
+    List<PatientQueryResponse> result = patientQueryRepository.findAllByDto_optimization();
+    return new ResultResponse<>(result);
+  }
+
 }
