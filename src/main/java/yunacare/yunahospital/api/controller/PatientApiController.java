@@ -3,6 +3,9 @@ package yunacare.yunahospital.api.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import yunacare.yunahospital.api.dto.request.CreatePatientRequest;
 import yunacare.yunahospital.api.dto.request.PatientSearchRequest;
 import yunacare.yunahospital.api.dto.response.CreatePatientResponse;
+import yunacare.yunahospital.api.dto.response.PaginationResultResponse;
 import yunacare.yunahospital.api.dto.response.PatientResponseDto;
 import yunacare.yunahospital.api.dto.response.ResultResponse;
 import yunacare.yunahospital.domain.Address;
@@ -60,9 +64,11 @@ public class PatientApiController {
 
   // 환자 조회(페이징 dto_최적화)
   @GetMapping("/patients")
-  public ResultResponse<List<PatientQueryResponse>> findPatients(@Valid PatientSearchRequest request) {
-    List<PatientQueryResponse> result = patientQueryRepository.findAllByDto_optimization(request);
-    return new ResultResponse<>(result);
+  public PaginationResultResponse<PatientQueryResponse> findPatients(
+      @Valid PatientSearchRequest request,
+      @PageableDefault(size = 10) Pageable pageable) {
+    Page<PatientQueryResponse> result = patientQueryRepository.findAllByDto_optimization(request, pageable);
+    return new PaginationResultResponse<>(result);
   }
 
 }

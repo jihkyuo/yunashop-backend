@@ -9,10 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -23,8 +27,8 @@ import yunacare.yunahospital.api.dto.request.PatientSearchRequest;
 public class PatientQueryRepository {
   private final JPAQueryFactory queryFactory;
 
-  public List<PatientQueryResponse> findAllByDto_optimization(PatientSearchRequest request) {
-    List<PatientQueryResponse> result = findPatients(request);
+  public Page<PatientQueryResponse> findAllByDto_optimization(PatientSearchRequest request, Pageable pageable) {
+    List<PatientQueryResponse> result = findPatients(request, pageable);
 
     if (!result.isEmpty()) {
       Map<Long, List<AppointmentQueryResponse>> appointmentMap = findAppointmentMap(toPatientIds(result));
@@ -32,7 +36,10 @@ public class PatientQueryRepository {
       result.forEach(p -> p.setAppointments(
           appointmentMap.getOrDefault(p.getPatientId(), new ArrayList<>())));
     }
-    return result;
+
+    JPAQuery<Long> countQuery = getCountQuery(request);
+
+    return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
   }
 
   private Map<Long, List<AppointmentQueryResponse>> findAppointmentMap(List<Long> patientIds) {
@@ -55,7 +62,7 @@ public class PatientQueryRepository {
         .collect(Collectors.toList());
   }
 
-  private List<PatientQueryResponse> findPatients(PatientSearchRequest request) {
+  private List<PatientQueryResponse> findPatients(PatientSearchRequest request, Pageable pageable) {
     return queryFactory
         .select(Projections.constructor(PatientQueryResponse.class,
             patient.id,
@@ -67,9 +74,20 @@ public class PatientQueryRepository {
             nameContains(request.getName()),
             phoneContains(request.getPhone()),
             cityContains(request.getCity()))
-        .offset(request.getOffset())
-        .limit(request.getLimit())
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize())
         .fetch();
+  }
+
+  private JPAQuery<Long> getCountQuery(PatientSearchRequest request) {
+    JPAQuery<Long> countQuery = queryFactory
+        .select(patient.count())
+        .from(patient)
+        .where(
+            nameContains(request.getName()),
+            phoneContains(request.getPhone()),
+            cityContains(request.getCity()));
+    return countQuery;
   }
 
   // 검색 조건 메서드
