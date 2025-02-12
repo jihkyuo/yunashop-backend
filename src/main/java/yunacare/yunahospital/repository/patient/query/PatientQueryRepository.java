@@ -9,14 +9,15 @@ import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import yunacare.yunahospital.api.dto.request.PatientSearchRequest;
 
 @Repository
 @RequiredArgsConstructor
 public class PatientQueryRepository {
   private final EntityManager em;
 
-  public List<PatientQueryResponse> findAllByDto_optimization() {
-    List<PatientQueryResponse> result = findPatients();
+  public List<PatientQueryResponse> findAllByDto_optimization(PatientSearchRequest request) {
+    List<PatientQueryResponse> result = findPatients(request);
     Map<Long, List<AppointmentQueryResponse>> appointmentMap = findAppointmentMap(toPatientIds(result));
 
     result.forEach(p -> p.setAppointments(
@@ -38,10 +39,12 @@ public class PatientQueryRepository {
     return result.stream().map(PatientQueryResponse::getPatientId).collect(Collectors.toList());
   }
 
-  private List<PatientQueryResponse> findPatients() {
+  private List<PatientQueryResponse> findPatients(PatientSearchRequest request) {
     return em.createQuery(
         "select new yunacare.yunahospital.repository.patient.query.PatientQueryResponse(p.id, p.name, p.phone, p.address) from Patient p",
         PatientQueryResponse.class)
+        .setFirstResult(request.getOffset())
+        .setMaxResults(request.getLimit())
         .getResultList();
   }
 }
