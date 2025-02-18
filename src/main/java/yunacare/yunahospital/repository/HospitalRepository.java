@@ -26,4 +26,9 @@ public class HospitalRepository {
     return em.createQuery("select h from Hospital h", Hospital.class).getResultList();
   }
 
+  public void delete(Long hospitalId) {
+    Hospital hospital = findOne(hospitalId);
+    em.remove(hospital);
+  }
+
 }
