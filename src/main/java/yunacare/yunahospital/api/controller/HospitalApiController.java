@@ -11,7 +11,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import yunacare.yunahospital.api.dto.request.CreateHospitalRequest;
 import yunacare.yunahospital.api.dto.response.CreateHospitalResponse;
-import yunacare.yunahospital.domain.Hospital;
+import yunacare.yunahospital.api.dto.response.ResultResponse;
+import yunacare.yunahospital.repository.hospital.query.HospitalQueryRepository;
+import yunacare.yunahospital.repository.hospital.query.HospitalQueryResponse;
 import yunacare.yunahospital.service.HospitalService;
 
 @RestController
@@ -19,10 +21,11 @@ import yunacare.yunahospital.service.HospitalService;
 public class HospitalApiController {
 
   private final HospitalService hospitalService;
+  private final HospitalQueryRepository hospitalQueryRepository;
 
   @GetMapping("/hospitals")
-  public List<Hospital> findHospitals() {
-    return hospitalService.findHospitals();
+  public ResultResponse<List<HospitalQueryResponse>> findHospitals() {
+    return new ResultResponse<>(hospitalQueryRepository.findAllByDto_optimization());
   }
 
   @PostMapping("/hospitals")
