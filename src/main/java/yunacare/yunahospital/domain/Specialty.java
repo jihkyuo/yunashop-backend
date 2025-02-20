@@ -25,4 +25,11 @@ public class Specialty {
 
   @OneToMany(mappedBy = "specialty")
   private List<Doctor> doctors = new ArrayList<>();
+
+  // ===== 생성 메서드 =====
+  public static Specialty createSpecialty(String name) {
+    Specialty specialty = new Specialty();
+    specialty.setName(name);
+    return specialty;
+  }
 }
